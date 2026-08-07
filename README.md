@@ -308,12 +308,5 @@ contém os principais cenários de demonstração:
 9. Teste de Rate Limiting
 10. Excesso de requisições → `429`
 
-Após realizar o login, copie o JWT retornado para a variável:
-
-```text
-token
-```
-
-do ambiente do Insomnia.
 
 
