@@ -6,5 +6,5 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 
-INSERT INTO users (username, password, role) VALUES ('admin', 'senha123', 'ADMIN');
-INSERT INTO users (username, password, role) VALUES ('user', 'senha123', 'USER');
+INSERT INTO users (username, password, role) VALUES ('admin', '$2a$12$umfyJiA3PdioNIPMqpQFiucNw7qrNZVNTBAtf2ezN6p1HT2uF9A2W', 'ADMIN');
+INSERT INTO users (username, password, role) VALUES ('user', '$2a$12$umfyJiA3PdioNIPMqpQFiucNw7qrNZVNTBAtf2ezN6p1HT2uF9A2W', 'USER');

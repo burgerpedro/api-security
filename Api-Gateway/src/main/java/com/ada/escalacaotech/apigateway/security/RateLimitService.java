@@ -29,7 +29,6 @@ public class RateLimitService {
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
-
     }
 
 }

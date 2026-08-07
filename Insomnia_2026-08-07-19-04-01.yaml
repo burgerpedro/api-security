@@ -1,0 +1,235 @@
+type: collection.insomnia.rest/5.0
+schema_version: "5.1"
+name: API Gateway Seguro - Projeto Final
+meta:
+  id: wrk_3cfb06bddcd64518a7353bfdac0afe85
+  created: 1786139430302
+  modified: 1786139430302
+  description: ""
+collection:
+  - url: "{{ _.base_url }}/api/pedidos"
+    name: JWT inválido
+    meta:
+      id: req_2956dae8019d4d588116bc0d15977e7f
+      created: 0
+      modified: 1786140014467
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlzcyI6ImFwaS1nYXRld2F5IiwiaWF0IjoxNzg2MTM5Nzg5LCJleHAiOjE3ODYxNDMzODksInJvbGVzIjoiQURNSU4ifQ.7qDuGUpOtek5jeXuMvc6V9H8-KNjRi1jZSIRz_YI15645
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos/admin"
+    name: Pedidos Admin - ADMIN
+    meta:
+      id: req_54548d27a3c6479893db55b42dbf3fd1
+      created: 0
+      modified: 1786140002448
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiIsImlzcyI6ImFwaS1nYXRld2F5IiwiaWF0IjoxNzg2MTM5Nzg5LCJleHAiOjE3ODYxNDMzODksInJvbGVzIjoiQURNSU4ifQ.7qDuGUpOtek5jeXuMvc6V9H8-KNjRi1jZSIRz_YIRmk
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/auth/login"
+    name: Login ADMIN
+    meta:
+      id: req_54a512d4298a40e1b1b393b1a792eddf
+      created: 0
+      modified: 1786139927893
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: POST
+    body:
+      mimeType: application/json
+      text: '{"username":"admin","password":"senha123"}'
+    headers:
+      - name: Content-Type
+        value: application/json
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/auth/login"
+    name: Login USER
+    meta:
+      id: req_68602009a34d4782b7084dc4ca7b8e5b
+      created: 0
+      modified: 1786140021451
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: POST
+    body:
+      mimeType: application/json
+      text: '{"username":"user","password":"senha123"}'
+    headers:
+      - name: Content-Type
+        value: application/json
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: http://localhost:8081/api/pedidos
+    name: Acesso direto ao Order-Service
+    meta:
+      id: req_79f3352ea0844a00ae4bfa5221a15c19
+      created: 0
+      modified: 1786139752391
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos"
+    name: Pedidos - USER ou ADMIN
+    meta:
+      id: req_8105d26adc9c498d8cf117c6698753a6
+      created: 0
+      modified: 1786139727165
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiYXBpLWdhdGV3YXkiLCJpYXQiOjE3ODYxMzk0NjMsImV4cCI6MTc4NjE0MzA2Mywicm9sZXMiOiJVU0VSIn0.y_MQQtPQ6u06AJSBHtNAB5dHyNDwGJQq-uKXrrA5zy0"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos"
+    name: " JWT expirado"
+    meta:
+      id: req_a5ead62b54d347fea2600024969fd089
+      created: 0
+      modified: 1786140128223
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiYXBpLWdhdGV3YXkiLCJpYXQiOjE3ODYxNDAxMTYsImV4cCI6MTc4NjE0MDExNiwicm9sZXMiOiJVU0VSIn0.10m0R4CQOA4K4pE9npTvlfyye2YDQDAbUZij2ZKUNC4
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos"
+    name: Pedidos sem JWT
+    meta:
+      id: req_b28e36c13f4a456ba42069be9622a478
+      created: 0
+      modified: 1786139625583
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos"
+    name: Rate Limit
+    meta:
+      id: req_fe9d9fb9749e4f9aaee3e3af7e96071a
+      created: 0
+      modified: 1786140148007
+      isPrivate: false
+      description: ""
+      sortKey: 0
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiYXBpLWdhdGV3YXkiLCJpYXQiOjE3ODYxMzk0NjMsImV4cCI6MTc4NjE0MzA2Mywicm9sZXMiOiJVU0VSIn0.y_MQQtPQ6u06AJSBHtNAB5dHyNDwGJQq-uKXrrA5zy0
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: "{{ _.base_url }}/api/pedidos/admin"
+    name: GET Pedidos/Admin token User - UNAUTHORIZED
+    meta:
+      id: req_c9ac3d8cd5144e628ae2d1f0e118be82
+      created: 1786139870399
+      modified: 1786140049655
+      isPrivate: false
+      description: ""
+      sortKey: 50
+    method: GET
+    authentication:
+      type: bearer
+      token: eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJ1c2VyIiwiaXNzIjoiYXBpLWdhdGV3YXkiLCJpYXQiOjE3ODYxMzk0NjMsImV4cCI6MTc4NjE0MzA2Mywicm9sZXMiOiJVU0VSIn0.y_MQQtPQ6u06AJSBHtNAB5dHyNDwGJQq-uKXrrA5zy0"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_f9d3e40a9cef679d72b0873c9f67b18c090a030b
+    created: 1786139430524
+    modified: 1786139430524
+environments:
+  name: Base Environment
+  meta:
+    id: env_d07d597c30d440759ea604e70c9deb21
+    created: 0
+    modified: 0
+    isPrivate: false
+  data:
+    base_url: https://localhost:8443
+    
