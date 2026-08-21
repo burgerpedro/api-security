@@ -3,7 +3,6 @@ package com.ada.escalacaotech.apigateway.security;
 import io.github.bucket4j.Bucket;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.ReactiveSecurityContextHolder;
 import org.springframework.security.core.context.SecurityContext;
@@ -16,10 +15,8 @@ import reactor.core.publisher.Mono;
 import java.nio.charset.StandardCharsets;
 /**
  * Funcionalidade desenvolvida utilizando TDD (Red → Green → Refactor).
- *
  * O rate limiting utiliza o usuário autenticado como identificador
  * quando disponível e o endereço IP como fallback.
- *
  * Cenários protegidos por testes:
  * - Reutilização do bucket para o mesmo usuário;
  * - Buckets independentes para usuários diferentes;
@@ -40,47 +37,39 @@ public class RateLimitFilter implements WebFilter {
     public Mono<Void> filter(ServerWebExchange exchange,
                              WebFilterChain chain) {
 
-        String ip = exchange.getRequest()
-                .getRemoteAddress()
-                .getAddress()
-                .getHostAddress();
+        var remoteAddress = exchange.getRequest().getRemoteAddress();
+
+        String ip = remoteAddress != null && remoteAddress.getAddress() != null
+                ? remoteAddress.getAddress().getHostAddress()
+                : null;
 
         return ReactiveSecurityContextHolder.getContext()
                 .map(SecurityContext::getAuthentication)
                 .filter(Authentication::isAuthenticated)
-                .flatMap(authentication -> {
-
-                    String username = authentication.getName();
-
-                    Bucket bucket =
-                            rateLimitService.resolveBucketForUser(username);
-
-                    return processBucket(bucket, exchange, chain);
-                })
+                .map(Authentication::getName)
+                .map(rateLimitService::resolveBucketForUser)
                 .switchIfEmpty(
-                        Mono.defer(() -> {
-
-                            Bucket bucket =
-                                    rateLimitService.resolveBucket(ip);
-
-                            return processBucket(bucket, exchange, chain);
-                        })
+                        Mono.fromSupplier(
+                                () -> rateLimitService.resolveBucket(ip)
+                        )
+                )
+                .flatMap(bucket ->
+                        processBucket(bucket, exchange, chain)
                 );
     }
 
     private Mono<Void> tooManyRequests(ServerWebExchange exchange) {
 
-        exchange.getResponse().setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
-        exchange.getResponse().getHeaders()
-                .setContentType(MediaType.APPLICATION_JSON);
+        exchange.getResponse()
+                .setStatusCode(HttpStatus.TOO_MANY_REQUESTS);
 
         String body = """
-                {
-                  "status":429,
-                  "error":"Too Many Requests",
-                  "message":"Rate limit exceeded"
-                }
-                """;
+            {
+              "status":429,
+              "error":"Too Many Requests",
+              "message":"Rate limit exceeded"
+            }
+            """;
 
         DataBuffer buffer = exchange.getResponse()
                 .bufferFactory()

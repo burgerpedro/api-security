@@ -1,5 +1,6 @@
 package com.ada.escalacaotech.apigateway.security;
 
+
 import io.github.bucket4j.Bucket;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -58,9 +59,6 @@ public class RateLimitFilterTest {
                 .thenReturn(authentication);
 
         when(rateLimitService.resolveBucketForUser("admin"))
-                .thenReturn(bucket);
-
-        when(rateLimitService.resolveBucket(anyString()))
                 .thenReturn(bucket);
 
         when(bucket.tryConsume(1))
@@ -141,5 +139,59 @@ public class RateLimitFilterTest {
         );
 
         verify(chain, never()).filter(exchange);
+    }
+
+    @Test
+    void shouldReturnTooManyRequestsForAuthenticatedUser() {
+
+        var request = MockServerHttpRequest
+                .get("/api/pedidos")
+                .remoteAddress(
+                        new java.net.InetSocketAddress("127.0.0.1", 8080)
+                )
+                .build();
+
+        var exchange = MockServerWebExchange.from(request);
+
+        var authentication =
+                new UsernamePasswordAuthenticationToken(
+                        "admin",
+                        null,
+                        null
+                );
+
+        SecurityContext securityContext = mock(SecurityContext.class);
+
+        when(securityContext.getAuthentication())
+                .thenReturn(authentication);
+
+        when(rateLimitService.resolveBucketForUser("admin"))
+                .thenReturn(bucket);
+
+        when(bucket.tryConsume(1))
+                .thenReturn(false);
+
+        rateLimitFilter.filter(exchange, chain)
+                .contextWrite(
+                        ReactiveSecurityContextHolder
+                                .withSecurityContext(
+                                        Mono.just(securityContext)
+                                )
+                )
+                .block();
+
+        assertEquals(
+                HttpStatus.TOO_MANY_REQUESTS,
+                exchange.getResponse().getStatusCode()
+        );
+
+        verify(rateLimitService)
+                .resolveBucketForUser("admin");
+
+        verify(bucket)
+                .tryConsume(1);
+
+        verify(chain, never())
+                .filter(exchange);
     }
 }
