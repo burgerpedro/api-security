@@ -4,6 +4,9 @@ import io.github.bucket4j.Bucket;
 import org.springframework.core.io.buffer.DataBuffer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.ReactiveSecurityContextHolder;
+import org.springframework.security.core.context.SecurityContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import org.springframework.web.server.WebFilter;
@@ -11,7 +14,18 @@ import org.springframework.web.server.WebFilterChain;
 import reactor.core.publisher.Mono;
 
 import java.nio.charset.StandardCharsets;
-
+/**
+ * Funcionalidade desenvolvida utilizando TDD (Red → Green → Refactor).
+ *
+ * O rate limiting utiliza o usuário autenticado como identificador
+ * quando disponível e o endereço IP como fallback.
+ *
+ * Cenários protegidos por testes:
+ * - Reutilização do bucket para o mesmo usuário;
+ * - Buckets independentes para usuários diferentes;
+ * - Fallback para IP sem autenticação;
+ * - Retorno HTTP 429 quando o limite é excedido.
+ */
 @Component
 public class RateLimitFilter implements WebFilter {
 
@@ -21,6 +35,7 @@ public class RateLimitFilter implements WebFilter {
         this.rateLimitService = rateLimitService;
     }
 
+    //TDD REFACTOR
     @Override
     public Mono<Void> filter(ServerWebExchange exchange,
                              WebFilterChain chain) {
@@ -30,13 +45,27 @@ public class RateLimitFilter implements WebFilter {
                 .getAddress()
                 .getHostAddress();
 
-        Bucket bucket = rateLimitService.resolveBucket(ip);
+        return ReactiveSecurityContextHolder.getContext()
+                .map(SecurityContext::getAuthentication)
+                .filter(Authentication::isAuthenticated)
+                .flatMap(authentication -> {
 
-        if (!bucket.tryConsume(1)) {
-            return tooManyRequests(exchange);
-        }
+                    String username = authentication.getName();
 
-        return chain.filter(exchange);
+                    Bucket bucket =
+                            rateLimitService.resolveBucketForUser(username);
+
+                    return processBucket(bucket, exchange, chain);
+                })
+                .switchIfEmpty(
+                        Mono.defer(() -> {
+
+                            Bucket bucket =
+                                    rateLimitService.resolveBucket(ip);
+
+                            return processBucket(bucket, exchange, chain);
+                        })
+                );
     }
 
     private Mono<Void> tooManyRequests(ServerWebExchange exchange) {
@@ -59,5 +88,17 @@ public class RateLimitFilter implements WebFilter {
 
         return exchange.getResponse()
                 .writeWith(Mono.just(buffer));
+    }
+
+    private Mono<Void> processBucket(
+            Bucket bucket,
+            ServerWebExchange exchange,
+            WebFilterChain chain) {
+
+        if (!bucket.tryConsume(1)) {
+            return tooManyRequests(exchange);
+        }
+
+        return chain.filter(exchange);
     }
 }

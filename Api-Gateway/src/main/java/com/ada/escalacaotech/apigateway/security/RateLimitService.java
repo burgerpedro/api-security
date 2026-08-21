@@ -9,7 +9,11 @@ import java.time.Duration;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-
+/**
+ * Suporte à funcionalidade de Rate Limiting desenvolvida com TDD.
+ * Os buckets são reutilizados para o mesmo identificador
+ * e independentes para identificadores diferentes.
+ */
 @Service
 public class RateLimitService {
 
@@ -29,6 +33,11 @@ public class RateLimitService {
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
+    }
+
+    //TDD
+    public Bucket resolveBucketForUser(String username) {
+        return resolveBucket("USER:" + username);
     }
 
 }
